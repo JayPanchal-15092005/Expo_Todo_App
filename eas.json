@@ -3,9 +3,13 @@
     "preview": {
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "CONVEX_DEPLOYMENT" : "dev:bright-chihuahua-408",
+        "EXPO_PUBLIC_CONVEX_URL" : "https://bright-chihuahua-408.convex.cloud"
       }
     },
-    "preview2": {
+    "preview2": { 
       "android": {
         "gradleCommand": ":app:assembleRelease"
       }
