@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Todoa_app",
-    "slug": "Todoa_app_",
+    "name": "Todo_app",
+    "slug": "Todo_app_",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

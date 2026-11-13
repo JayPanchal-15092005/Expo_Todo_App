@@ -1,21 +1,23 @@
 import { ThemeProvide } from "@/hooks/useTheme";
-import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { requestNotificationPermissions, scheduleDailyBriefing } from "@/services/notifications";
 import { Stack } from "expo-router";
-
-const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
-  unsavedChangesWarning: false,
-});
+import { useEffect } from "react";
 
 export default function RootLayout() {
+  useEffect(() => {
+    // Request notification permission and set up daily reminder
+    requestNotificationPermissions().then((granted) => {
+      if (granted) {
+        scheduleDailyBriefing(9, 0); // 9:00 AM daily briefing
+      }
+    });
+  }, []);
+
   return (
-    <ConvexProvider client={convex}>
     <ThemeProvide>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
-        // I need to remove this options that says the title Home after
-        completed the APP.
       </Stack>
     </ThemeProvide>
-    </ConvexProvider>
   );
 }

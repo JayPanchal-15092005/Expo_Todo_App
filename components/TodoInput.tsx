@@ -1,29 +1,32 @@
-import { createHomeStyles } from '@/assets/styles/home.styles';
-import { api } from '@/convex/_generated/api';
+import { createHomeStyles } from "@/assets/styles/home.styles";
 import useTheme from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
-import { useMutation } from 'convex/react';
 import { LinearGradient } from "expo-linear-gradient";
-import { useState } from 'react';
-import { Alert, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useState } from "react";
+import { TextInput, TouchableOpacity, View } from "react-native";
 
-const TodoInput = () => {
+interface TodoInputProps {
+  onAddQuick: (text: string) => Promise<void>;
+  onOpenAdvanced: () => void;
+}
 
-    const { colors } = useTheme();
-    const homeStyles = createHomeStyles(colors);
-    const [newTodo, setNewTodo] = useState("");
-    const addTodo = useMutation(api.todos.addTodo)
+const TodoInput: React.FC<TodoInputProps> = ({ onAddQuick, onOpenAdvanced }) => {
+  const { colors } = useTheme();
+  const homeStyles = createHomeStyles(colors);
+  const [newTodo, setNewTodo] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
 
-    const handleAddTodo = async () => {
-        if (newTodo.trim()) {
-            try {
-                await addTodo({ text: newTodo.trim() });
-                setNewTodo("");
-            } catch (error) {
-                Alert.alert("Error", "Failed to add Todo");
-            }
-        }
+  const handleAdd = async () => {
+    if (newTodo.trim() && !isAdding) {
+      try {
+        setIsAdding(true);
+        await onAddQuick(newTodo.trim());
+        setNewTodo("");
+      } finally {
+        setIsAdding(false);
+      }
     }
+  };
 
   return (
     <View style={homeStyles.inputSection}>
@@ -33,10 +36,35 @@ const TodoInput = () => {
           placeholder="What needs to be done?"
           value={newTodo}
           onChangeText={setNewTodo}
-          onSubmitEditing={handleAddTodo}
+          onSubmitEditing={handleAdd}
           placeholderTextColor={colors.textMuted}
+          returnKeyType="done"
         />
-        <TouchableOpacity onPress={handleAddTodo} activeOpacity={0.8} disabled={!newTodo.trim()}>
+
+        {/* Advanced / Details button */}
+        <TouchableOpacity
+          onPress={onOpenAdvanced}
+          activeOpacity={0.8}
+          style={{
+            width: 50,
+            height: 56,
+            borderRadius: 20,
+            borderWidth: 1.5,
+            borderColor: colors.border,
+            backgroundColor: colors.backgrounds.input,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Ionicons name="options-outline" size={22} color={colors.primary} />
+        </TouchableOpacity>
+
+        {/* Quick Add Button */}
+        <TouchableOpacity
+          onPress={handleAdd}
+          activeOpacity={0.8}
+          disabled={!newTodo.trim() || isAdding}
+        >
           <LinearGradient
             colors={newTodo.trim() ? colors.gradients.primary : colors.gradients.muted}
             style={[homeStyles.addButton, !newTodo.trim() && homeStyles.addButtonDisabled]}
@@ -47,6 +75,6 @@ const TodoInput = () => {
       </View>
     </View>
   );
-}
+};
 
 export default TodoInput;
